@@ -223,10 +223,11 @@ void MainWindow::layout_init(){
 
     setCentralWidget(Image_window);
     addDockWidget(Qt::TopDockWidgetArea,Tool_window);
-    addDockWidget(Qt::RightDockWidgetArea,Gray_window);
     addDockWidget(Qt::RightDockWidgetArea,Shape_window);
+    addDockWidget(Qt::RightDockWidgetArea,Gray_window);
+  //  addDockWidget(Qt::RightDockWidgetArea,Shape_window);
     //合并
-    tabifyDockWidget(Gray_window,Shape_window);
+    tabifyDockWidget(Shape_window,Gray_window);
 
 }
 void MainWindow::Tool_init(){
@@ -235,12 +236,14 @@ void MainWindow::Tool_init(){
     pen_button->setToolTip(QStringLiteral("画笔"));
     pen_button->setObjectName("toolButton");
     pen_button->setFixedSize(30,30);//设置小部件长宽高
+    pen_button->setStatusTip(QStringLiteral("画笔"));
 
     //直线
     QPushButton *line_button=new QPushButton(QIcon("../picture/line.png"),tr(""),this);
     line_button->setToolTip(QStringLiteral("直线"));
     line_button->setObjectName("toolButton");
     line_button->setFixedSize(30,30);
+    line_button->setStatusTip(QStringLiteral("直线"));
 
     //矩形
 
@@ -248,12 +251,14 @@ void MainWindow::Tool_init(){
     rec_button->setToolTip(QStringLiteral("矩形"));
     rec_button->setObjectName("toolButton");
     rec_button->setFixedSize(30,30);
+    rec_button->setStatusTip(QStringLiteral("矩形"));
 
     //六边形
     QPushButton *hex_button=new QPushButton(QIcon("../picture/hex.png"),tr(""),this);
-    hex_button->setToolTip(QStringLiteral("矩形"));
+    hex_button->setToolTip(QStringLiteral("六边形"));
     hex_button->setObjectName("toolButton");
     hex_button->setFixedSize(30,30);
+    hex_button->setStatusTip(QStringLiteral("六边形"));
 
 
     //圆形
@@ -261,6 +266,7 @@ void MainWindow::Tool_init(){
     cycle_button->setToolTip(QStringLiteral("圆形"));
     cycle_button->setObjectName("toolButton");
     cycle_button->setFixedSize(30,30);
+    cycle_button->setStatusTip(QStringLiteral("圆形"));
 
     //按钮布局设置
     QGridLayout *tools_layout=new QGridLayout();
