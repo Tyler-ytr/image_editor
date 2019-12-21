@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QtGui>
+#include <QtWidgets>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,8 +21,15 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QDockWidget *Image_window;//图像浮动窗口
+    QString Image_path;// 当前图片的路径
+    QLabel* Image_label;// 图像显示框
+
+
+
     void init();
-    void Menu_init();
+    void Menu_init();//初始化菜单
+    void Image_init();//初始化图像窗口
 private slots:
     void iSlot();
     void file_new();
