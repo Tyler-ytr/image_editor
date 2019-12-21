@@ -42,8 +42,12 @@ void MainWindow::init(){
     resize(QApplication::desktop()->width()*0.9, QApplication::desktop()->height()*0.9);
     move(QApplication::desktop()->width()*0.05, QApplication::desktop()->height()*0.05);
 
+
+
+    layout_init();
     Menu_init();
     Image_init();
+
 
 
 
@@ -57,6 +61,7 @@ void MainWindow:: Menu_init(){
     //file子菜单栏
     //QAction(const QIcon &icon, const QString &text, QObject *parent = nullptr)
     //新建
+   // QAction *afile_new=new QAction(QIcon("../picture/painter.jpg"),QStringLiteral("新建"),this);
     QAction *afile_new=new QAction(QIcon("../picture/newer.png"),QStringLiteral("新建"),this);
     afile_new->setShortcut(QKeySequence::New);//快捷键
     connect(afile_new,SIGNAL(triggered()),this,SLOT(file_new()));
@@ -142,10 +147,10 @@ void MainWindow::file_save(){
     temp_image.save(Image_path);
 }
 void MainWindow::file_saveas(){
-    QString temp_path=QFileDialog::getSaveFileName(this,QStringLiteral("另存为图像"),".",tr("Images(*.jpg *.png *.bmp)"));
+     QString temp_path=QFileDialog::getSaveFileName(this,QStringLiteral("保存图像"),".",tr("Images(*.jpg *.png *.bmp)"));
     if(!(temp_path.isEmpty())){
         QImage temp_image=Image_label->pixmap()->toImage();//读取
-        temp_image.save(Image_path);
+        temp_image.save(temp_path);
         Image_path=temp_path;
     }
 }
@@ -153,7 +158,7 @@ void MainWindow::file_saveas(){
 
 void MainWindow::Image_init(){
 
-    Image_window=new QDockWidget(QStringLiteral("图像编辑框"),this);//初始化 Image_window
+    //Image_window=new QDockWidget(QStringLiteral("图像编辑框"),this);//初始化 Image_window
     setCentralWidget(Image_window);//居中
 
     //QLabel初始化 用来显示图像
@@ -176,3 +181,31 @@ void MainWindow::Image_init(){
     Image_window->setWidget(scrollArea);
 
 }
+
+void MainWindow::layout_init(){
+
+    QWidget* p = takeCentralWidget();	//删除中央窗体
+        if (p)
+            delete p;
+    setDockNestingEnabled(true);		//允许嵌套dock
+
+    Image_window=new QDockWidget(QStringLiteral("图像编辑框"),this);//初始化 Image_window
+    Image_window->setFeatures(QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable);//可以移动可以浮动，不能关闭
+    Image_window->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);//可以左右移动
+    Image_window->setMinimumSize(500,500);//最小长宽高
+
+    Shape_window=new QDockWidget(QStringLiteral("形状处理"),this);
+    Gray_window=new QDockWidget(QStringLiteral("灰度处理"),this);
+    Tool_window=new QDockWidget(QStringLiteral("工具栏"),this);
+
+    setCentralWidget(Image_window);
+    addDockWidget(Qt::TopDockWidgetArea,Tool_window);
+    addDockWidget(Qt::RightDockWidgetArea,Gray_window);
+    addDockWidget(Qt::RightDockWidgetArea,Shape_window);
+    //合并
+    tabifyDockWidget(Gray_window,Shape_window);
+
+
+}
+
+
