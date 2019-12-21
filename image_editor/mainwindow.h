@@ -34,5 +34,7 @@ private slots:
     void iSlot();
     void file_new();
     void file_open();
+    void file_save();
+    void file_saveas();
 };
 #endif // MAINWINDOW_H

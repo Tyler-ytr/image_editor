@@ -66,12 +66,25 @@ void MainWindow:: Menu_init(){
     afile_open->setShortcut(QKeySequence::Open);
     connect(afile_open,SIGNAL(triggered()),this,SLOT(file_open()));
 
+    //保存
+    QAction *afile_save=new QAction(QIcon("../picture/save.png"),QStringLiteral("保存"),this);
+    afile_save->setShortcut(QKeySequence::Save);
+    connect(afile_save,SIGNAL(triggered()),this,SLOT(file_save()));
+
+    //另存为
+    QAction *afile_saveas=new QAction(QIcon("../picture/saveas.png"),QStringLiteral("另存为"),this);
+    afile_saveas->setShortcut(QKeySequence::SaveAs);
+    connect(afile_saveas,SIGNAL(triggered()),this,SLOT(file_saveas()));
+
+
 
 
 
     //添加动作到file菜单栏上面
     mfile->addAction(afile_new);
     mfile->addAction(afile_open);
+    mfile->addAction(afile_save);
+    mfile->addAction(afile_saveas);
 
 
 
@@ -82,10 +95,15 @@ void MainWindow:: Menu_init(){
 
     toolBar->addAction(afile_new);
     toolBar->addAction(afile_open);
+    toolBar->addAction(afile_save);
+
 
 
     //Tips:
-    afile_new->setStatusTip(QStringLiteral("新建"));
+    afile_new->setStatusTip(QStringLiteral("新建图像"));
+    afile_open->setStatusTip(QStringLiteral("打开文件"));
+    afile_save->setStatusTip(QStringLiteral("保存文件"));
+
 
 
 
@@ -110,6 +128,24 @@ void MainWindow::file_open(){
         }
         Image_label->setPixmap(QPixmap::fromImage(*temp_image));
         Image_label->resize(temp_image->width(),temp_image->height());
+        Image_path=temp_path;
+    }
+}
+void MainWindow::file_save(){
+    if(Image_path.isEmpty()){//新建就保存它
+        QString temp_path=QFileDialog::getSaveFileName(this,QStringLiteral("保存图像"),".",tr("Images(*.jpg *.png *.bmp)"));
+        if(!(temp_path.isEmpty())){
+            Image_path=temp_path;
+        }
+    }
+    QImage temp_image=Image_label->pixmap()->toImage();//读取
+    temp_image.save(Image_path);
+}
+void MainWindow::file_saveas(){
+    QString temp_path=QFileDialog::getSaveFileName(this,QStringLiteral("另存为图像"),".",tr("Images(*.jpg *.png *.bmp)"));
+    if(!(temp_path.isEmpty())){
+        QImage temp_image=Image_label->pixmap()->toImage();//读取
+        temp_image.save(Image_path);
         Image_path=temp_path;
     }
 }
