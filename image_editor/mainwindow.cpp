@@ -42,13 +42,16 @@ void MainWindow::init(){
     resize(QApplication::desktop()->width()*0.9, QApplication::desktop()->height()*0.9);
     move(QApplication::desktop()->width()*0.05, QApplication::desktop()->height()*0.05);
 
-
+    Menu_init();
+    Color_init();
+   // Menu_init();
+    Shape_init();
 
     layout_init();
-    Menu_init();
+    //Menu_init();
     Tool_init();
     Image_init();
-    Color_init();
+  //  Color_init();
 
 }
 void MainWindow:: Menu_init(){
@@ -189,7 +192,7 @@ void MainWindow::Image_init(){
 
 
     //滚动条
-    QScrollArea * scrollArea=new QScrollArea(this);
+    scrollArea=new QScrollArea(this);
     scrollArea->setBackgroundRole(QPalette::Dark);
     scrollArea->setAlignment(Qt::AlignCenter);
     scrollArea->setWidget(Image_label);
@@ -217,7 +220,7 @@ void MainWindow::layout_init(){
     Image_window->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);//可以左右移动
     Image_window->setMinimumSize(500,500);//最小长宽高
 
-    Shape_window=new QDockWidget(QStringLiteral("形状处理"),this);
+    //Shape_window=new QDockWidget(QStringLiteral("形状处理"),this);
     Gray_window=new QDockWidget(QStringLiteral("灰度处理"),this);
     Tool_window=new QDockWidget(QStringLiteral("工具栏"),this);
 
@@ -402,6 +405,88 @@ void MainWindow::pen_color(){
             frame_color->setStyleSheet("QFrame{background-color: rgba(" + QString::number(c.red()) + "," + QString::number(c.green()) + "," + QString::number(c.blue()) + ",1);border:none}");
         }
 }
+void MainWindow::Shape_init(){
+    Shape_window=new QDockWidget(QStringLiteral("形状处理"),this);
+    Shape_window->setFeatures(QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable);//可以移动可以浮动，不能关闭
+
+    QLabel *placeholder=new QLabel(tr("    "));//占位
+
+    //修改图片大小
+    QLabel *Size_title=new QLabel(QStringLiteral("图像大小"));
+    QLabel *Size_Ln=new QLabel(QStringLiteral("长度: "));
+    QLabel *Size_Wn=new QLabel(QStringLiteral("宽度: "));
+    QPushButton *Size_default=new QPushButton(QStringLiteral("默认"));
+    QPushButton *Size_yes=new QPushButton(QStringLiteral("确定"));
+
+    size_L=new QLineEdit("128");
+    size_L->setValidator(new QIntValidator(0, 1000));//只能输入1-1000的int型
+    size_L->setAlignment(Qt::AlignLeft);//居左
 
 
+    size_W=new QLineEdit("128");
+    size_W->setValidator(new QIntValidator(0, 1000));//只能输入1-1000的int型
+    size_W->setAlignment(Qt::AlignLeft);//居左
+
+    connect(Size_default,SIGNAL(clicked()),this,SLOT(size_auto()));
+    connect(Size_yes,SIGNAL(clicked()),this,SLOT(size_change()));
+
+
+
+
+    //布局
+    QGridLayout *Shape_layout = new QGridLayout();
+    Shape_layout->setAlignment(Qt::AlignTop);//从上面开始布局
+    Shape_layout->setMargin(25);//空间与窗体的左右边距
+
+
+    Shape_layout->addWidget(Size_title,0,0,1,1);
+
+    Shape_layout->addWidget(Size_Ln,1,1,1,1);
+    Shape_layout->addWidget(size_L,1,2,1,1);
+    Shape_layout->addWidget(Size_Wn,2,1,1,1);
+    Shape_layout->addWidget(size_W,2,2,1,1);
+    Shape_layout->addWidget(Size_default,1,3,1,1);
+    Shape_layout->addWidget(Size_yes,2,3,1,1);
+
+
+    QWidget *Shape_Widget = new QWidget(Shape_window);
+    Shape_Widget->setFixedSize(420,600);
+    Shape_Widget->setLayout(Shape_layout);
+    Shape_window->setWidget(Shape_Widget);
+
+    //滚动条
+    QScrollArea *scrollArea = new QScrollArea(Shape_window);
+    scrollArea->setAlignment(Qt::AlignLeft);
+    scrollArea->setWidget(Shape_Widget);
+    Shape_window->setWidget(scrollArea);
+
+
+
+
+
+
+
+
+
+
+;
+}
+void MainWindow::size_auto(){
+    //自适应
+    QImage temp_image;
+    double Image_ratio=1.0*Image_label->getImage().width()/Image_label->getImage().height();//宽度/长度;
+    double Win_ratio=1.0*(scrollArea->width()-2)/(scrollArea->height()-2);//窗口长宽比;
+    if(Image_ratio>Win_ratio){
+        temp_image=Image_label->getImage().scaled(scrollArea->width()-2,(scrollArea->width() - 2)/Image_ratio);
+    }else{
+        temp_image=Image_label->getImage().scaled(scrollArea->height()-2,(scrollArea->height() - 2)/Image_ratio);
+    }
+    Image_show(temp_image,true);
+}
+void MainWindow::size_change(){
+    int L=size_L->text().toInt();
+    int W=size_W->text().toInt();
+    QImage Image=Shape::Resize(Image_label->getImage(),L,W);
+    Image_show(Image,true);
+}
 

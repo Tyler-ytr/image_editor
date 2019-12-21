@@ -21,7 +21,7 @@ QImage PaintWidget::getImage()                      // 外部获取图像
         return image;
     else{
         QImage temp_image=QImage(500,500,QImage::Format_RGB32);//创建图像
-        temp_image.fill(Qt::blue);
+        temp_image.fill(Qt::white);
         return temp_image;
     }
 }
