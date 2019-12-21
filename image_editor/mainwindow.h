@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtGui>
 #include <QtWidgets>
+#include "PaintWidget.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -27,6 +28,17 @@ private:
 
     QDockWidget *Tool_window;//工具栏
 
+    //Tool 中的变量
+    int tooltype;
+    QButtonGroup *toolbuttons;//tool 按钮组
+
+    //Color Tools
+    QToolBar * Color_bar;
+    QSpinBox *spinbox_penWidth;
+    QFrame *frame_color;
+
+
+
 
 
 
@@ -36,7 +48,8 @@ private:
 
 
     QString Image_path;// 当前图片的路径
-    QLabel* Image_label;// 图像显示框
+   // QLabel* Image_label;// 图像显示框
+    PaintWidget * Image_label;
 
 
 
@@ -45,12 +58,18 @@ private:
     void Menu_init();//初始化菜单
     void Tool_init();//初始化工具栏
     void Image_init();//初始化图像窗口
+    void Color_init();//初始化颜色/线宽栏;
+    void Image_show(QImage Img, bool isSave);//显示图像
+
 private slots:
     void iSlot();
     void file_new();
     void file_open();
     void file_save();
     void file_saveas();
+    void tool_clicked(int type);
+    void pen_width();//画笔宽度;
+    void pen_color();//设置画笔ya颜色
 
 };
 #endif // MAINWINDOW_H

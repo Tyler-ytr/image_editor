@@ -46,12 +46,9 @@ void MainWindow::init(){
 
     layout_init();
     Menu_init();
+    Tool_init();
     Image_init();
-
-
-
-
-
+    Color_init();
 
 }
 void MainWindow:: Menu_init(){
@@ -116,8 +113,9 @@ void MainWindow:: Menu_init(){
 void MainWindow:: file_new(){
     QImage image=QImage(500,500,QImage::Format_RGB32);//创建图像
     image.fill(Qt::white);
-    Image_label->setPixmap(QPixmap::fromImage(image));
-    Image_label->resize(image.width(),image.height());
+    Image_show(image,true);
+    //Image_label->setPixmap(QPixmap::fromImage(image));
+    //Image_label->resize(image.width(),image.height());
     Image_path="";//路径为空;
 
 }
@@ -131,8 +129,9 @@ void MainWindow::file_open(){
             delete temp_image;
             return;
         }
-        Image_label->setPixmap(QPixmap::fromImage(*temp_image));
-        Image_label->resize(temp_image->width(),temp_image->height());
+//        Image_label->setPixmap(QPixmap::fromImage(*temp_image));
+//        Image_label->resize(temp_image->width(),temp_image->height());
+        Image_show(*temp_image,true);
         Image_path=temp_path;
     }
 }
@@ -140,18 +139,31 @@ void MainWindow::file_save(){
     if(Image_path.isEmpty()){//新建就保存它
         QString temp_path=QFileDialog::getSaveFileName(this,QStringLiteral("保存图像"),".",tr("Images(*.jpg *.png *.bmp)"));
         if(!(temp_path.isEmpty())){
+            //Image_path=temp_path;
+            QImage temp_image=Image_label->getImage();
+            temp_image.save(temp_path);
             Image_path=temp_path;
+            Image_show(temp_image,true);
+
         }
+    }else{
+        QImage temp_image=Image_label->getImage();
+        temp_image.save(Image_path);
+        Image_show(temp_image,true);
     }
-    QImage temp_image=Image_label->pixmap()->toImage();//读取
-    temp_image.save(Image_path);
+//    QImage temp_image=Image_label->pixmap()->toImage();//读取
+//    temp_image.save(Image_path);
 }
 void MainWindow::file_saveas(){
      QString temp_path=QFileDialog::getSaveFileName(this,QStringLiteral("保存图像"),".",tr("Images(*.jpg *.png *.bmp)"));
     if(!(temp_path.isEmpty())){
-        QImage temp_image=Image_label->pixmap()->toImage();//读取
+        QImage temp_image=Image_label->getImage();
         temp_image.save(temp_path);
         Image_path=temp_path;
+        Image_show(temp_image,true);
+//        QImage temp_image=Image_label->pixmap()->toImage();//读取
+//        temp_image.save(temp_path);
+//        Image_path=temp_path;
     }
 }
 
@@ -162,14 +174,17 @@ void MainWindow::Image_init(){
     setCentralWidget(Image_window);//居中
 
     //QLabel初始化 用来显示图像
-    Image_label=new QLabel(Image_window);
+    Image_label=new PaintWidget(Image_window);
     Image_label->setScaledContents(true);//自适应
 
     //初始化图像(全白)
     QImage image=QImage(500,500,QImage::Format_RGB32);//新建
     image.fill(Qt::white);
-    Image_label->setPixmap((QPixmap::fromImage(image)));
-    Image_label->resize(image.width(),image.height());//Imagelabel和图像一样大
+    Image_label->setPenWidth(1);//默认笔宽
+    Image_label->setPenColor(Qt::black);
+    Image_label->setPixmap(QPixmap::fromImage(image));
+//    Image_label->setPixmap((QPixmap::fromImage(image)));
+//    Image_label->resize(image.width(),image.height());//Imagelabel和图像一样大
 
 
 
@@ -180,6 +195,14 @@ void MainWindow::Image_init(){
     scrollArea->setWidget(Image_label);
     Image_window->setWidget(scrollArea);
 
+}
+void MainWindow::Image_show(QImage Img, bool isSave){
+    Image_label->setImage(Img);
+    Image_label->setPixmap(QPixmap::fromImage(Img));
+    Image_label->resize(Img.width(),Img.height());
+//    if(isSave==true){
+
+//    }
 }
 
 void MainWindow::layout_init(){
@@ -205,7 +228,174 @@ void MainWindow::layout_init(){
     //合并
     tabifyDockWidget(Gray_window,Shape_window);
 
+}
+void MainWindow::Tool_init(){
+    //画笔
+    QPushButton *pen_button=new QPushButton(QIcon("../picture/painter.png"),tr(""),this);
+    pen_button->setToolTip(QStringLiteral("画笔"));
+    pen_button->setObjectName("toolButton");
+    pen_button->setFixedSize(30,30);//设置小部件长宽高
+
+    //直线
+    QPushButton *line_button=new QPushButton(QIcon("../picture/line.png"),tr(""),this);
+    line_button->setToolTip(QStringLiteral("直线"));
+    line_button->setObjectName("toolButton");
+    line_button->setFixedSize(30,30);
+
+    //矩形
+
+    QPushButton *rec_button=new QPushButton(QIcon("../picture/rec.png"),tr(""),this);
+    rec_button->setToolTip(QStringLiteral("矩形"));
+    rec_button->setObjectName("toolButton");
+    rec_button->setFixedSize(30,30);
+
+    //六边形
+    QPushButton *hex_button=new QPushButton(QIcon("../picture/hex.png"),tr(""),this);
+    hex_button->setToolTip(QStringLiteral("矩形"));
+    hex_button->setObjectName("toolButton");
+    hex_button->setFixedSize(30,30);
+
+
+    //圆形
+    QPushButton *cycle_button=new QPushButton(QIcon("../picture/round.png"),tr(""),this);
+    cycle_button->setToolTip(QStringLiteral("圆形"));
+    cycle_button->setObjectName("toolButton");
+    cycle_button->setFixedSize(30,30);
+
+    //按钮布局设置
+    QGridLayout *tools_layout=new QGridLayout();
+    tools_layout->setAlignment(Qt::AlignLeft);//水平靠左对齐
+    tools_layout->addWidget(pen_button,0,0);
+    tools_layout->addWidget(line_button,0,1);
+    tools_layout->addWidget(rec_button,0,2);
+    tools_layout->addWidget(hex_button,0,3);
+    tools_layout->addWidget(cycle_button,0,4);
+
+    //加入Tool_window
+    QWidget *tools_widget=new QWidget(Tool_window);
+    tools_widget->setLayout(tools_layout);
+    Tool_window->setWidget(tools_widget);
+
+    //按钮组
+    toolbuttons=new QButtonGroup();
+    toolbuttons->addButton(pen_button,1);
+    toolbuttons->addButton(line_button,2);
+    toolbuttons->addButton(rec_button,3);
+    toolbuttons->addButton(hex_button,4);
+    toolbuttons->addButton(cycle_button,5);
+
+
+    //连接槽函数
+    connect(toolbuttons,SIGNAL(buttonClicked(int)),this,SLOT(tool_clicked(int)));
+
 
 }
+
+void MainWindow::tool_clicked(int type){
+    QList<QAbstractButton*>buttons=toolbuttons->buttons();
+    foreach(QAbstractButton *button,buttons){
+        if(toolbuttons->button(type)!=button){
+            button->setChecked(false);//互斥
+        }else if(tooltype==type){
+            tooltype=0;//点两次取消;
+        }else{
+            tooltype=type;
+        }
+
+    }
+
+
+    switch (tooltype){
+    case 0:
+        Image_label->setShape(PaintWidget::null_state);
+            //QMessageBox::information(this,QStringLiteral("画笔没有做!"),QStringLiteral("退出绘制"));
+        break;
+    case 1:
+            //QMessageBox::information(this,QStringLiteral("画笔没有做!"),QStringLiteral("画笔"));
+        Image_label->setShape(PaintWidget::Pen);
+        break;
+    case 2:
+           //QMessageBox::information(this,QStringLiteral("直线没有做!"),QStringLiteral("直线"));
+        Image_label->setShape(PaintWidget::Line);
+        break;
+    case 3:
+       // QMessageBox::information(this,QStringLiteral("直线没有做!"),QStringLiteral("矩形"));
+        Image_label->setShape(PaintWidget::Rec);
+        break;
+    case 4:
+       // QMessageBox::information(this,QStringLiteral("直线没有做!"),QStringLiteral("六边形"));
+        Image_label->setShape(PaintWidget::Hex);
+        break;
+    case 5:
+        //QMessageBox::information(this,QStringLiteral("直线没有做!"),QStringLiteral("圆"));
+        Image_label->setShape(PaintWidget::Cycle);
+        break;
+    default:
+        break;
+
+
+    }
+
+
+}
+
+
+void MainWindow::Color_init(){
+   Color_bar=new QToolBar();
+   Color_bar=addToolBar(QStringLiteral("画笔属性栏"));
+   Color_bar->setMovable(true);
+
+   QLabel *label_penWidth = new QLabel(QStringLiteral("画笔宽度"));
+   spinbox_penWidth = new QSpinBox;
+   spinbox_penWidth->setRange(1, 50);
+   spinbox_penWidth->setValue(2);
+
+   QPushButton *color_botton=new QPushButton(QStringLiteral("画笔颜色"));
+   //取色框
+   frame_color = new QFrame;
+   frame_color->setObjectName("colorFrame");
+   frame_color->setFrameShape(QFrame::Box);
+   frame_color->setPalette(QPalette(Qt::black));
+   frame_color->setAutoFillBackground(true);
+   frame_color->setFixedSize(30, 30);
+   frame_color->setStyleSheet("QFrame{background-color: rgba(" + QString::number(0) + "," + QString::number(0) + "," + QString::number(0) + ",1);border:none}");
+
+   //槽函数
+   connect(spinbox_penWidth, SIGNAL(valueChanged(int)), this, SLOT(pen_width()));
+   connect(color_botton,SIGNAL(clicked()), this, SLOT(pen_color()));
+
+    QHBoxLayout *color_layout = new QHBoxLayout();//水平布局
+    color_layout->setAlignment(Qt::AlignLeft);
+
+    color_layout->addWidget(label_penWidth);
+    color_layout->addWidget(spinbox_penWidth);
+    color_layout->addWidget(color_botton);
+    color_layout->addWidget(frame_color);
+
+    QWidget *color_Widget=new QWidget();
+    color_Widget->setLayout(color_layout);
+    Color_bar->addWidget(color_Widget);
+
+
+
+
+
+
+}
+void MainWindow::pen_width(){
+    int x=spinbox_penWidth->text().toInt();
+    Image_label->setPenWidth(x);
+
+}
+void MainWindow::pen_color(){
+    QColor c = QColorDialog::getColor(Qt::yellow);
+    if (c.isValid())
+        {
+            frame_color->setPalette(QPalette(c));
+            Image_label->setPenColor(c);
+            frame_color->setStyleSheet("QFrame{background-color: rgba(" + QString::number(c.red()) + "," + QString::number(c.green()) + "," + QString::number(c.blue()) + ",1);border:none}");
+        }
+}
+
 
 
