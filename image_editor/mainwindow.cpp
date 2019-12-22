@@ -35,6 +35,8 @@ void MainWindow::iSlot()                       // 槽函数
     QMessageBox::information(this, tr("hello"), tr("Hello World!"));
 }
 void MainWindow::init(){
+    //初始化图片vector
+    Image_vector.resize(2);
     //图标和标题;
     setWindowIcon(QIcon("../picture/icon.png"));
     setWindowTitle(QStringLiteral("图片编辑器 by Larry"));
@@ -82,6 +84,16 @@ void MainWindow:: Menu_init(){
     afile_saveas->setShortcut(QKeySequence::SaveAs);
     connect(afile_saveas,SIGNAL(triggered()),this,SLOT(file_saveas()));
 
+    //撤销
+    afile_undo=new QAction(QIcon("../picture/undo.png"),QStringLiteral("撤销"),this);
+    afile_undo->setShortcut(QKeySequence::Undo);
+    connect(afile_undo,SIGNAL(triggered()),this,SLOT(file_undo()));
+
+
+    //重做
+    afile_redo=new QAction(QIcon("../picture/redo.png"),QStringLiteral("重做"),this);
+    afile_redo->setShortcut(QKeySequence::Redo);
+    connect(afile_redo,SIGNAL(triggered()),this,SLOT(file_redo()));
 
 
 
@@ -91,6 +103,8 @@ void MainWindow:: Menu_init(){
     mfile->addAction(afile_open);
     mfile->addAction(afile_save);
     mfile->addAction(afile_saveas);
+    mfile->addAction(afile_undo);
+    mfile->addAction(afile_redo);
 
 
 
@@ -102,6 +116,8 @@ void MainWindow:: Menu_init(){
     toolBar->addAction(afile_new);
     toolBar->addAction(afile_open);
     toolBar->addAction(afile_save);
+    toolBar->addAction(afile_undo);
+    toolBar->addAction(afile_redo);
 
 
 
@@ -113,6 +129,14 @@ void MainWindow:: Menu_init(){
 
 
 
+}
+
+void MainWindow::file_undo(){
+    undo();
+}
+void MainWindow::file_redo(){
+   // qDebug()<<"heress";
+    redo();
 }
 void MainWindow:: file_new(){
     QImage image=QImage(500,500,QImage::Format_RGB32);//创建图像
@@ -187,10 +211,14 @@ void MainWindow::Image_init(){
     Image_label->setPenWidth(1);//默认笔宽
     Image_label->setPenColor(Qt::black);
     Image_label->setPixmap(QPixmap::fromImage(image));
+    Image_vector[0].push_back(image);//初始存储;
+    Image_iter=Image_vector[0].end()-1;
+   // Image_show(Image_label->getImage(),true);
 //    Image_label->setPixmap((QPixmap::fromImage(image)));
 //    Image_label->resize(image.width(),image.height());//Imagelabel和图像一样大
 
-
+    afile_redo->setEnabled(false);
+    afile_undo->setEnabled(false);
 
     //滚动条
     scrollArea=new QScrollArea(this);
@@ -204,9 +232,56 @@ void MainWindow::Image_show(QImage Img, bool isSave){
     Image_label->setImage(Img);
     Image_label->setPixmap(QPixmap::fromImage(Img));
     Image_label->resize(Img.width(),Img.height());
-//    if(isSave==true){
+    if(isSave==true){
+       if(Image_iter!=(Image_vector[0].end()-1)){
+           //不是最后一个;
+           Image_vector[0].erase(++Image_iter,Image_vector[0].end());//删除从指针后面一个到最后的所有图像;
 
-//    }
+       }
+       //这个时候指针指的是最后一个;
+       Image_vector[0].push_back(Img);
+       Image_iter=Image_vector[0].end()-1;
+       afile_undo->setEnabled(true);
+       afile_redo->setEnabled(false);
+
+    }
+
+
+}
+void MainWindow::undo(){
+    if(Image_iter!=Image_vector[0].begin()){
+        Image_iter--;
+        Image_show(*Image_iter,false);
+        afile_redo->setEnabled(true);
+        if(Image_iter==Image_vector[0].begin()){
+            afile_undo->setEnabled(false);
+        }
+    }
+    ;
+
+}
+void MainWindow::redo(){
+    if(Image_iter!=(Image_vector[0].end()-1)){
+        Image_iter+=1;
+        Image_show(*Image_iter,false);
+        afile_undo->setEnabled(true);
+
+        if(Image_iter==(Image_vector[0].end()-1)){
+            afile_redo->setEnabled(false);
+        }
+    }
+//    if (iter != (imgVector[0].end() - 1))		// 后面还有对象
+//	{
+//		iter++;
+//		ShowImage(*iter, false);
+//		output("系统提示：重做");
+//		I_menubar->Act_edit_undo->setEnabled(true);
+
+//		if (iter == (imgVector[0].end() - 1))
+//		{
+//			I_menubar->Act_edit_redo->setEnabled(false);
+//		}
+//	}
 }
 
 void MainWindow::layout_init(){
@@ -604,17 +679,22 @@ void MainWindow::Colorchange_init(){
 
 }
 void MainWindow::Color_gray(){
-    //qDebug()<<"here";
+ //   qDebug()<<"here";
+
     QImage result=Colorchange::Gray(Image_label->getImage());
+    //result.convertToFormat(QImage::Format_RGB32);
+   // qInformation("sdsd");
     Image_show(result,true);
 }
 void MainWindow::Color_binary(){
    ;
     QImage result=Colorchange::Binary(Image_label->getImage());
+//result.convertToFormat(QImage::Format_RGB32);
     Image_show(result,true);
 }
 void MainWindow::Color_reversal(){
     QImage result=Colorchange::Reversal(Image_label->getImage());
+  // result.convertToFormat(QImage::Format_RGB32);
     Image_show(result,true);
 }
 

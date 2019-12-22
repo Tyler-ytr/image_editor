@@ -47,3 +47,5 @@ INCLUDEPATH+=F:/opencv/build/include
 INCLUDEPATH+=F:/opencv/build/include/opencv2
 INCLUDEPATH += F:/opencv/build/x64/vc15
 DEPENDPATH += F:/opencv/build/x64/vc15
+
+RC_FILE+="../picture/icon.rc"

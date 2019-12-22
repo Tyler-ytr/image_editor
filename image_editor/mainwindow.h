@@ -8,6 +8,7 @@
 #include "ImagetoMat.h"
 #include "Shape.h"
 #include "Color.h"
+#include <vector>
 
 
 
@@ -30,6 +31,10 @@ private:
     QDockWidget *Color_window;//颜色总体的设置 包括灰度化等
     QDockWidget *Shape_window;//形状处理;
 
+    //目录中的变量;
+    QAction *afile_undo;//撤销;
+    QAction *afile_redo;//恢复;
+
     QDockWidget *Tool_window;//工具栏
     QScrollArea * scrollArea;//滚动条
 
@@ -46,6 +51,11 @@ private:
     QLineEdit *size_L, *size_W;
     QSpinBox *spinbox_rotateangles;
     QSpinBox *spinbox_scaletimes;
+
+    std::vector<std::vector<QImage>> Image_vector;//图片vector 用来实现redo undo功能
+    std::vector<QImage>::iterator Image_iter;//迭代器
+
+
 
 
 
@@ -72,13 +82,16 @@ private:
     void Shape_init();//形状调整窗口初始化
     void Colorchange_init();//颜色调整窗口初始化
     void Image_show(QImage Img, bool isSave);//显示图像
-
+    void undo();
+    void redo();
 private slots:
     void iSlot();
     void file_new();
     void file_open();
     void file_save();
     void file_saveas();
+    void file_undo();
+    void file_redo();
     void tool_clicked(int type);
     void pen_width();//画笔宽度;
     void pen_color();//设置画笔的颜色
