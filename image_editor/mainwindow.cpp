@@ -554,6 +554,68 @@ void MainWindow::flip_xy(){
 
 void MainWindow::Colorchange_init(){
      Color_window=new QDockWidget(QStringLiteral("颜色处理"),this);
+     Color_window->setFeatures(QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable);//可以移动可以浮动，不能关闭
+
+     //灰度化
+     QLabel *Gray_title=new QLabel(QStringLiteral("灰度变换:"));
+     QPushButton *BGray_change=new QPushButton(QStringLiteral("灰度化"));
+     connect(BGray_change,SIGNAL(clicked()),this,SLOT(Color_gray()));
+
+     //二值化
+     QLabel *BinaryColor_title=new QLabel(QStringLiteral("二值变换:"));
+     QPushButton *BBinaryColor=new QPushButton(QStringLiteral("二值化"));
+     connect(BBinaryColor,SIGNAL(clicked()),this,SLOT(Color_binary()));
+
+     //颜色反转
+     QLabel *Reversal_title=new QLabel(QStringLiteral("反色变换:"));
+     QPushButton *BReversal_change=new QPushButton(QStringLiteral("反色"));
+     connect(BReversal_change,SIGNAL(clicked()),this,SLOT(Color_reversal()));
+
+
+     //布局
+     QGridLayout *Colorchange_layout=new QGridLayout();
+     Colorchange_layout->setAlignment(Qt::AlignTop);//从上面开始布局
+     Colorchange_layout->setMargin(25);//空间与窗体的左右边距
+
+     Colorchange_layout->addWidget(Gray_title,0,0,1,1);
+     Colorchange_layout->addWidget(BGray_change,0,1,1,1);
+
+     Colorchange_layout->addWidget(BinaryColor_title,1,0,1,1);
+     Colorchange_layout->addWidget(BBinaryColor,1,1,1,1);
+
+     Colorchange_layout->addWidget(Reversal_title,2,0,1,1);
+     Colorchange_layout->addWidget(BReversal_change,2,1,1,1);
+
+
+
+
+
+
+     QWidget *Colorchange_Widget=new QWidget(Color_window);
+     Colorchange_Widget->setFixedSize(420,600);
+     Colorchange_Widget->setLayout(Colorchange_layout);
+     Color_window->setWidget(Colorchange_Widget);
+
+     //滚动条
+     QScrollArea *scrollArea = new QScrollArea(Color_window);
+     scrollArea->setAlignment(Qt::AlignLeft);
+     scrollArea->setWidget( Colorchange_Widget);
+     Color_window->setWidget(scrollArea);
+
+}
+void MainWindow::Color_gray(){
+    //qDebug()<<"here";
+    QImage result=Colorchange::Gray(Image_label->getImage());
+    Image_show(result,true);
+}
+void MainWindow::Color_binary(){
+   ;
+    QImage result=Colorchange::Binary(Image_label->getImage());
+    Image_show(result,true);
+}
+void MainWindow::Color_reversal(){
+    QImage result=Colorchange::Reversal(Image_label->getImage());
+    Image_show(result,true);
 }
 
 

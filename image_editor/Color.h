@@ -16,6 +16,11 @@ public:
     Colorchange();
     ~Colorchange();
 
+    static QImage Gray(QImage image);
+    static QImage Binary(QImage image);
+    static QImage Reversal(QImage image);
+
+
 
 };
 

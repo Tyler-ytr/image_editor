@@ -88,6 +88,10 @@ private slots:
     void picture_scale();//图像缩放一定的倍数,值shi spinbox_caletims/100;
     void flip_x();
     void flip_y();
-    void flip_xy();
+    void flip_xy();//镜像
+    void Color_gray();//灰度化;
+    void Color_binary();//二值化;
+    void Color_reversal();//颜色反转;
+
 };
 #endif // MAINWINDOW_H
