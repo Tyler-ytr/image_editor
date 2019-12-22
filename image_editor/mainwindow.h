@@ -7,6 +7,7 @@
 #include "PaintWidget.h"
 #include "ImagetoMat.h"
 #include "Shape.h"
+#include "Color.h"
 
 
 
@@ -26,7 +27,7 @@ public:
 private:
     Ui::MainWindow *ui;
     QDockWidget *Image_window;//图像浮动窗口
-    QDockWidget *Gray_window;//灰度设置
+    QDockWidget *Color_window;//颜色总体的设置 包括灰度化等
     QDockWidget *Shape_window;//形状处理;
 
     QDockWidget *Tool_window;//工具栏
@@ -43,6 +44,8 @@ private:
 
     //形状处理里面的变量
     QLineEdit *size_L, *size_W;
+    QSpinBox *spinbox_rotateangles;
+    QSpinBox *spinbox_scaletimes;
 
 
 
@@ -67,6 +70,7 @@ private:
     void Image_init();//初始化图像窗口
     void Color_init();//初始化颜色/线宽栏;
     void Shape_init();//形状调整窗口初始化
+    void Colorchange_init();//颜色调整窗口初始化
     void Image_show(QImage Img, bool isSave);//显示图像
 
 private slots:
@@ -80,6 +84,10 @@ private slots:
     void pen_color();//设置画笔的颜色
     void size_auto();//适应窗口大小
     void size_change();//改变图片大小
-
+    void picture_rotate();//旋转一定角度， 根据spinbox_rotateangles里面的值
+    void picture_scale();//图像缩放一定的倍数,值shi spinbox_caletims/100;
+    void flip_x();
+    void flip_y();
+    void flip_xy();
 };
 #endif // MAINWINDOW_H

@@ -19,8 +19,9 @@ public:
     ~Shape();
 
     static QImage Resize(QImage image,int length,int width);//改变大小
-    QImage Scale(QImage image,int times);//缩放
-    QImage Rotate(QImage image,int angle);//旋转
+    static QImage Scale(QImage image,double scale);//缩放
+    static QImage Rotate(QImage image,int angle);//旋转
+    static QImage Flip(QImage image,int type);//type=0:x轴;1 y轴;2 xy;
 
 
 //private:

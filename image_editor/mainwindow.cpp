@@ -46,6 +46,7 @@ void MainWindow::init(){
     Color_init();
    // Menu_init();
     Shape_init();
+    Colorchange_init();
 
     layout_init();
     //Menu_init();
@@ -221,16 +222,16 @@ void MainWindow::layout_init(){
     Image_window->setMinimumSize(500,500);//最小长宽高
 
     //Shape_window=new QDockWidget(QStringLiteral("形状处理"),this);
-    Gray_window=new QDockWidget(QStringLiteral("灰度处理"),this);
+  //  Color_window=new QDockWidget(QStringLiteral("颜色处理"),this);
     Tool_window=new QDockWidget(QStringLiteral("工具栏"),this);
 
     setCentralWidget(Image_window);
     addDockWidget(Qt::TopDockWidgetArea,Tool_window);
     addDockWidget(Qt::RightDockWidgetArea,Shape_window);
-    addDockWidget(Qt::RightDockWidgetArea,Gray_window);
+    addDockWidget(Qt::RightDockWidgetArea,Color_window);
   //  addDockWidget(Qt::RightDockWidgetArea,Shape_window);
     //合并
-    tabifyDockWidget(Shape_window,Gray_window);
+    tabifyDockWidget(Shape_window,Color_window);
 
 }
 void MainWindow::Tool_init(){
@@ -430,8 +431,39 @@ void MainWindow::Shape_init(){
     connect(Size_default,SIGNAL(clicked()),this,SLOT(size_auto()));
     connect(Size_yes,SIGNAL(clicked()),this,SLOT(size_change()));
 
+    //旋转
+    QLabel *Rotate_title=new QLabel(QStringLiteral("图像旋转"));
+    QLabel *Rotate_anglet=new QLabel(QStringLiteral("旋转角度: "));
+    QPushButton *Rotate_yes=new QPushButton(QStringLiteral("确定"));
 
+    spinbox_rotateangles=new QSpinBox();
+    spinbox_rotateangles->setRange(-360,360);
+    spinbox_rotateangles->setValue(0);
+    spinbox_rotateangles->setAlignment(Qt::AlignLeft);
+    connect(Rotate_yes,SIGNAL(clicked()),this,SLOT(picture_rotate()));
 
+    //缩放
+    QLabel *Scale_title=new QLabel(QStringLiteral("图像缩放"));
+    QLabel *Scale_timet=new QLabel(QStringLiteral("缩放百分比"));
+    QPushButton *Scale_yes=new QPushButton(QStringLiteral("确定"));
+
+    spinbox_scaletimes=new QSpinBox();
+    spinbox_scaletimes->setRange(10,900);
+   // spinbox_scaletimes->setSuffix(" %");//后缀
+    spinbox_scaletimes->setSingleStep(10);//步长
+    spinbox_scaletimes->setValue(100);
+    spinbox_scaletimes->setAlignment(Qt::AlignLeft);
+    connect(Scale_yes,SIGNAL(clicked()),this,SLOT(picture_scale()));
+
+    //镜像
+    QLabel *flip_title=new QLabel(QStringLiteral("图片镜像"));
+    QPushButton *Bflip_x=new QPushButton(QStringLiteral("x轴翻转"));
+    QPushButton *Bflip_y=new QPushButton(QStringLiteral("y轴翻转"));
+    QPushButton *Bflip_xy=new QPushButton(QStringLiteral("xy翻转"));
+
+    connect(Bflip_x,SIGNAL(clicked()),this,SLOT(flip_x()));
+    connect(Bflip_y,SIGNAL(clicked()),this,SLOT(flip_y()));
+    connect(Bflip_xy,SIGNAL(clicked()),this,SLOT(flip_xy()));
 
     //布局
     QGridLayout *Shape_layout = new QGridLayout();
@@ -447,6 +479,19 @@ void MainWindow::Shape_init(){
     Shape_layout->addWidget(size_W,2,2,1,1);
     Shape_layout->addWidget(Size_default,1,3,1,1);
     Shape_layout->addWidget(Size_yes,2,3,1,1);
+    Shape_layout->addWidget(Rotate_title,3,0,1,1);
+    Shape_layout->addWidget(Rotate_anglet,4,1,1,1);
+    Shape_layout->addWidget(spinbox_rotateangles,4,2,1,1);
+    Shape_layout->addWidget(Rotate_yes,4,3,1,1);
+    Shape_layout->addWidget(Scale_title,5,0,1,1);
+    Shape_layout->addWidget(Scale_timet,6,1,1,1);
+    Shape_layout->addWidget(spinbox_scaletimes,6,2,1,1);
+    Shape_layout->addWidget(Scale_yes,6,3,1,1);
+    Shape_layout->addWidget(flip_title,7,0,1,1);
+    Shape_layout->addWidget(Bflip_x,8,0,1,1);
+    Shape_layout->addWidget(Bflip_y,8,1,1,1);
+    Shape_layout->addWidget(Bflip_xy,8,2,1,1);
+
 
 
     QWidget *Shape_Widget = new QWidget(Shape_window);
@@ -460,16 +505,6 @@ void MainWindow::Shape_init(){
     scrollArea->setWidget(Shape_Widget);
     Shape_window->setWidget(scrollArea);
 
-
-
-
-
-
-
-
-
-
-;
 }
 void MainWindow::size_auto(){
     //自适应
@@ -489,4 +524,42 @@ void MainWindow::size_change(){
     QImage Image=Shape::Resize(Image_label->getImage(),L,W);
     Image_show(Image,true);
 }
+void MainWindow::picture_rotate(){
+    int angle=0-spinbox_rotateangles->text().toInt();
+    QImage result=Shape::Rotate(Image_label->getImage(),angle);
+    Image_show(result,true);
+
+}
+void MainWindow::picture_scale(){
+    //int scale_i=spinbox_scaletimes->text().toInt();
+    double scale=1.0*(spinbox_scaletimes->text().toDouble())/100;
+   qDebug()<<scale;
+    QImage result=Shape::Scale(Image_label->getImage(),scale);
+    Image_show(result,true);
+}
+void MainWindow::flip_x(){
+    QImage result=Shape::Flip(Image_label->getImage(),0);
+    Image_show(result,true);
+}
+
+void MainWindow::flip_y(){
+    QImage result=Shape::Flip(Image_label->getImage(),1);
+    Image_show(result,true);
+}
+void MainWindow::flip_xy(){
+    QImage result=Shape::Flip(Image_label->getImage(),2);
+    Image_show(result,true);
+}
+
+
+void MainWindow::Colorchange_init(){
+     Color_window=new QDockWidget(QStringLiteral("颜色处理"),this);
+}
+
+
+
+
+
+
+
 

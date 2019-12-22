@@ -16,6 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Color.cpp \
     ImagetoMat.cpp \
     PaintWidget.cpp \
     Shape.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
     mymenu.cpp
 
 HEADERS += \
+    Color.h \
     ImagetoMat.h \
     PaintWidget.h \
     Shape.h \
